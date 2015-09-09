@@ -1,0 +1,63 @@
+- LOOK INTO FETCH IN ES6 - talk to Rob, native to replace XmlHttpRequest, returns Promises
+- HTML5 Web Workers - new multithreading in javascript?
+
+- Asynchronous Primer
+
+    - In the beginning...
+        - When we first start programming, we learn how to code synchronously.
+        - Every statement runs to completion, followed by the next statement in the control flow, until the application completes. [Show two sync examples.]
+        - Major downside: Slow! Results in a terrible user experience. The world doesn’t want to wait. And on the opposite side of the spectrum, for web apps we need to be able to wait, when the user is idle for some time before interacting with the page.
+        - What does it mean for code to be asynchronous? Tasks are not necessarily run in their control flow order, but executed in a way that hopefully makes the most of your time and processing power.
+    - Different ways to make applications run faster
+        - Multithreading - Executing some work for a period of time, then switching to another task for some time, etc… An illusion of code running in parallel.
+        - Multiprocessing - Executing different tasks on different processors, literally running code in parallel.
+        - Combination of the two.
+        - Javascript’s solution - single-threaded code with callbacks.
+    - What does Javascript do?
+        - Front End - the Javascript event loop.
+            - Find out more about the UI thread and other threads handled by the browser.
+        - Back End - multithreading “under the hood”.
+    - What’s the big deal anyway?
+    - How is this different from threading? (Javascript handles this for us behind the scenes)
+- Promises
+
+    - What are they?
+    - What’s the big deal?
+
+        - Helps solve the callback “pyramid of doom."
+        - Allows us to “come back” from post-asynchronous code - we can return values, throw errors and access the stack as opposed to just having a callback method that is called separately.
+        - Allows us to pass around a result in the code even if it hasn’t been resolved yet.
+    - How can I use them - do I need to have an es.js file?
+    - How is this different from jquery-style promises/deferreds?
+
+        - Which should I use? (Always new-style where you can.)
+        - Include $.when? Returns a Promise from a deferred, a subset?
+    - Handling a promise
+
+        - The three statuses of a promise: pending, fulfilled, rejected
+        - Then clause
+        - Catch clause
+        - Chaining
+        - Handling several promises that are running concurrently: Promise.all
+    - Defining a promise
+    - Promise.resolve and Promise.reject
+
+        - Convert existing synchronous code or jquery promises to new-style Promises
+- Testing Asynchronous Code
+
+    - Testing jquery-style promises.
+    - Testing es6-style promises.
+    - Brief mention of creating a fake server with Sinon.js. (Used in adminv2 express app)
+- Async/Await
+
+    - Coming in ES7 (ECMAScript2016)
+    - How does it work/What is the syntax?
+    - What’s the big deal?
+
+        - Allows code to look like synchronous code again, even if it’s being run asynchronously
+- Generators - Another way of doing asynchronous programming
+    - Brief discussion - could be another discussion entirely
+    - Provides a bit of a cleaner syntax
+    - Comes from Python
+    - Allows for lazy sequences
+    - Some examples.

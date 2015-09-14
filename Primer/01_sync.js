@@ -7,7 +7,7 @@ var fun2 = function() {
 };
 
 var fun3 = function() {
-    console.log('in fun3!');
+    console.log('in fun3! ');
 };
 
 fun1();

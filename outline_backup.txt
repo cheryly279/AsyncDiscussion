@@ -5,28 +5,61 @@
 
     - In the beginning...
         - When we first start programming, we learn how to code synchronously.
-        - Every statement runs to completion, followed by the next statement in the control flow, until the application completes. [Show two sync examples.]
+        - Every statement runs to completion, followed by the next statement in the control flow, until the application completes. [Primer/01_sync.js, Primer/02_sync_plus_wait.js]
         - Major downside: Slow! Results in a terrible user experience. The world doesn’t want to wait. And on the opposite side of the spectrum, for web apps we need to be able to wait, when the user is idle for some time before interacting with the page.
-        - What does it mean for code to be asynchronous? Tasks are not necessarily run in their control flow order, but executed in a way that hopefully makes the most of your time and processing power.
-    - Different ways to make applications run faster
+        - Basically, that tasks are NOT necessarily run in their control flow order - it is not known at runtime when certain portions of code will run.
+    - What’s the big deal anyway?
+        - Allows applications to be executed in a way that makes the most of the system's processing power.
+        - Allows for event handling - the application can wait and respond to user events, such as clicking a button.
+        - Application can run several actions at once (or seemingly at once), allowing for a richer experience even if some actions are slow.
+        - Enables servers to handle more requests, and therefore more customers, without being blocked by slow I/O calls, for instance requests to a database.
+    - How do systems run multiple actions at once?
         - Multithreading - Executing some work for a period of time, then switching to another task for some time, etc… An illusion of code running in parallel.
         - Multiprocessing - Executing different tasks on different processors, literally running code in parallel.
-        - Combination of the two.
-        - Javascript’s solution - single-threaded code with callbacks.
     - What does Javascript do?
-        - Front End - the Javascript event loop.
-            - Find out more about the UI thread and other threads handled by the browser.
-        - Back End - multithreading “under the hood”.
-    - What’s the big deal anyway?
-    - How is this different from threading? (Javascript handles this for us behind the scenes)
+        - Javascript allows for asynchronous programming in a single thread, using callbacks.
+        - Under the hood, threads ARE used, but we don’t have to worry about this.
+        - Instead we use callbacks - functions are passed as an argument to another function call, containing code that we want to run when the actions of the first function call have completed. (Can’t just do this by default, the main function needs to be defined to accept a callback.)
+        - In the meantime, execution continues after the call to the first function. [Primer/03_async_timeout.js] TBD: Better example? With click events?
+        - In some cases, there can be separate callbacks for the different ways we would want to handle the result of asynchronous code - the most common example is the success and failure callbacks. TBD: Write example.
+        - For Javascript, this is implemented using an event loop.
+            - Generally looks like this: (https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop)
+
+            - while(queue.waitForMessage()){
+            -   queue.processNextMessage();
+            - }
+
+            - A function call is made, asking the runtime to perform some operation and also sending the callback to be run when the task completes.
+            - The application can then continue to run.
+            - When the earlier action completes, a message is added to the queue along with the callback.
+                - Behind the scenes, some of these actions (for instance, reading data from a file), may be being executed in parallel using other threads and processes. But your Javascript code, and the event loop are still in a single main thread.
+            - The event loop continually processes such messages, calling the callback functions as it goes.
+        - Using a single thread this way makes coding easier - the developer doesn’t have to worry about sharing data between threads or how the different threads are accessing the system’s resources. The resulting code is also generally easier to read.
 - Promises
-
-    - What are they?
-    - What’s the big deal?
-
-        - Helps solve the callback “pyramid of doom."
-        - Allows us to “come back” from post-asynchronous code - we can return values, throw errors and access the stack as opposed to just having a callback method that is called separately.
-        - Allows us to pass around a result in the code even if it hasn’t been resolved yet.
+    - But coding is always evolving. While using callbacks for asynchronous programming solves some problems, this coding style does still have it’s own downsides.
+        - While easier to read than code with multiple threads, it is still not as easy to read and understand as synchronous code.
+        - We cannot always pass separate callbacks for success and failure - instead, we have to check for errors in one callback.
+        - We cannot simply return to a specific point of execution from a callback - if there is code that must execute after the asynchronous call, it must be wrapped in the callback, which can get large and unwieldy. This makes callback code seem more like “side-effects” of the application, rather than main functionality. TBD: Write example.
+        - Multiple nested callbacks can result in the “pyramid of doom.” TBD: Write example.
+    - Promises, which are new in ES6 Javascript 2015 ECMAScript 2015, are created to help solve these problems.
+    - What are promises?
+        - While they can seem confusing at first, they are basically a cleaner way of writing the same single-threaded asynchronous code we have been discussing. There’s no new “magic” on how Javascript asynchronous code works. It’s more like syntactic sugar. But it’s really good syntactic sugar, more like syntactic HFCS.
+        - Promises allow us to treat the result of asynchronous code as a first-class citizen, similar to how Javascript allows us to pass functions around as arguments. We can now code in a way that is closer to how we would if we had the result synchronously - we can treat the promise itself as the result, even if the result is not complete yet.
+        - All of the above makes more sense once you start using the syntax (use funny gif here?).
+    - Syntax for using promises (we will define our own shortly)
+        - Where before we would pass the callback(s) as an argument (usually the final argument) to a function call, we now pass that code to handlers that are already attached to the promise. TBD: Write example using then, where catch code is the second argument.
+        - Now that we’ve seen the then handler, what about when the asynchronous operation causes an error? There is a built-in handler for that as well, the catch handler. TBD: Write example using catch.
+        - The asynchronous code runs whether the then/catch handlers are used or not.
+        - Only one of the handlers will be called (success or failure), and the handler will only be called once. At any given time, a promise is in one of three states:
+            - Pending - the asynchronous code has not completed yet.
+            - Fulfilled - the asynchronous code has completed successfully.
+            - Rejected - the asynchronous code has failed.
+        - Once the promise is fulfilled or rejected and the correct handler has been called, the promise is considered complete - the handlers will not be called again.
+        - However, handlers can be added to the promise after it has been fulfilled or rejected, and the proper handler will still execute.
+    - Chaining
+        - A great feature of promises is that it allows us to break up and order asynchronous code that depends on earlier asynchronous code. We can do this because the then and catch handlers return another promise.
+        - We can execute other asynchronous (or synchronous) operations from a then or catch handler, and simply handle the result in a then clause
+    - Take a step back - did this resolve the 4 issues above with callbacks?
     - How can I use them - do I need to have an es.js file?
     - How is this different from jquery-style promises/deferreds?
 
@@ -34,9 +67,6 @@
         - Include $.when? Returns a Promise from a deferred, a subset?
     - Handling a promise
 
-        - The three statuses of a promise: pending, fulfilled, rejected
-        - Then clause
-        - Catch clause
         - Chaining
         - Handling several promises that are running concurrently: Promise.all
     - Defining a promise

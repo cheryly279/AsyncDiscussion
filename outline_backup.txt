@@ -36,6 +36,7 @@
             - The event loop continually processes such messages, calling the callback functions as it goes.
         - Using a single thread this way makes coding easier - the developer doesn’t have to worry about sharing data between threads or how the different threads are accessing the system’s resources. The resulting code is also generally easier to read.
 - Promises
+
     - But coding is always evolving. While using callbacks for asynchronous programming solves some problems, this coding style does still have it’s own downsides.
         - While easier to read than code with multiple threads, it is still not as easy to read and understand as synchronous code.
         - We cannot always pass separate callbacks for success and failure - instead, we have to check for errors in one callback.
@@ -47,8 +48,9 @@
         - Promises allow us to treat the result of asynchronous code as a first-class citizen, similar to how Javascript allows us to pass functions around as arguments. We can now code in a way that is closer to how we would if we had the result synchronously - we can treat the promise itself as the result, even if the result is not complete yet.
         - All of the above makes more sense once you start using the syntax (use funny gif here?).
     - Syntax for using promises (we will define our own shortly)
-        - Where before we would pass the callback(s) as an argument (usually the final argument) to a function call, we now pass that code to handlers that are already attached to the promise. TBD: Write example using then, where catch code is the second argument.
-        - Now that we’ve seen the then handler, what about when the asynchronous operation causes an error? There is a built-in handler for that as well, the catch handler. TBD: Write example using catch.
+        - Where before we would pass the callback(s) as an argument (usually the final argument) to a function call, we now pass that code to handlers that are already attached to the promise - using the then function. TBD: Write example using then, where catch code is the second argument.
+        - What about when the asynchronous operation causes an error? The then handler covers this as well - the callback function to handle failures is passed to then as the second argument. TBD: Write example with success and failure callbacks.
+        - For convenience, Promises also have a catch handler. This is simply a shorthand for then(null, function()..). TBD: Write example using catch.
         - The asynchronous code runs whether the then/catch handlers are used or not.
         - Only one of the handlers will be called (success or failure), and the handler will only be called once. At any given time, a promise is in one of three states:
             - Pending - the asynchronous code has not completed yet.
@@ -57,22 +59,44 @@
         - Once the promise is fulfilled or rejected and the correct handler has been called, the promise is considered complete - the handlers will not be called again.
         - However, handlers can be added to the promise after it has been fulfilled or rejected, and the proper handler will still execute.
     - Chaining
-        - A great feature of promises is that it allows us to break up and order asynchronous code that depends on earlier asynchronous code. We can do this because the then and catch handlers return another promise.
-        - We can execute other asynchronous (or synchronous) operations from a then or catch handler, and simply handle the result in a then clause
-    - Take a step back - did this resolve the 4 issues above with callbacks?
-    - How can I use them - do I need to have an es.js file?
-    - How is this different from jquery-style promises/deferreds?
+        - A great feature of promises is that it allows us to break up and order asynchronous code that depends on earlier asynchronous code.
+        - From a then or catch handler, we can execute other asynchronous operations. The results of this code can then be handled in a subsequent then or catch handler.
+        - This is possible because the handlers themselves return a promise. TBD: Example! Question: What if a simple value is returned, is it turned into a promise? Also, mention good idea to always return something unless last then, because otherwise undefined is returned.
+        - Some notes about the catch handler:
+            - It’s good to end with a catch handler, as errors will flow down like in a try/catch block. If we don’t, any uncaught errors are simply lost.
+            - The result of a catch that doesn’t throw another error is a resolved promise - is there a better way to explain this?
+            - Using then and catch is NOT the same as using then with two callbacks - instead, catch is a handler for the next iteration of the chain. The upside of this is that errors from the previous then will be caught. When we instead call then with two callbacks, any new errors that come back from the first callback are not handled in the second callback. TBD: Example?
+    - Take a step back - did this resolve the 4 issues above with callbacks? Go back through each issue in a slide.
+    - Everything we have talked about so far has been about handling code that returns promises. But occasionally you are going to want to define your own promises, so that client code can handle your asynchronous function.
+        - Syntax: new Promise(function(resolve, reject) {…});
+        - In the function you pass to define the promise, you have the resolve and reject arguments. These are functions you can call to indicate that the work has completed successfully (using resolve) or not (using reject), and pass back a result or an error, respectively. TBD: Example defining a promise and also calling it.
+        - Javascript also provides shorthand methods Promise.resolve and Promise.reject, for creating promises that are defined to simply resolve with a value or reject with a reason. These are shorthand for new Promise(function (resolve, reject) { resolve(value); }) and new Promise(function (resolve, reject) { reject(error); }). These methods come in handy for testing, or for converting code that is not asynchronous, or doesn’t conform to the promises standard to a promise that does conform to the promises standard.
+    - Extra: Handling Several Concurrent Requests - Promise.all
+        - In synchronous code, if you have list of values to manipulate, you can simply loop through each value and handle it appropriately. However, what if the handling of each value involves calling an asynchronous function? Remember that when an asynchronous function is called, it begins executing in parallel to the rest of the code. If we were to call an asynchronous function in each iteration of a loop, we would have n number of parallel actions occurring. More importantly, each one would need it’s own then to access the result.
+        - Fortunately, the Promise object provides a way to wait for several promises to resolve - Promise.all. This function takes an array of promises and returns a promise that resolves when all the promises have resolved. Using the then handler will allow you to define a callback function that receives an array of results from the promises passed to all. TBD: Example.
+        - Note that the promise resolves when/if all the promises passed resolve - if one fails, the entire promise fails.
+    - How can I use them - do I need to have an es.js file? What browsers are they available for?
+    - Different types of promises/terminology
+        - The concept of promises isn’t new, and has been handled in different ways by different libraries. This has resulted, unfortunately, in confusing terminology and different types of promises.
+        - What we have been discussing so far are promises defined for Javascript, fulfilling a specification known as the Promises/A+ specification: https://promisesaplus.com/.
 
-        - Which should I use? (Always new-style where you can.)
-        - Include $.when? Returns a Promise from a deferred, a subset?
-    - Handling a promise
-
-        - Chaining
-        - Handling several promises that are running concurrently: Promise.all
-    - Defining a promise
-    - Promise.resolve and Promise.reject
-
-        - Convert existing synchronous code or jquery promises to new-style Promises
+        - Some terminology clarifiers:
+            - Thenable - an object (usually a promise) that has a then function, allowing us to chain our handlers.
+            - Future - simply an older term for promises.
+            - Deferred - jQuery’s version of promises (focus of this part of the discussion). Note that a jQuery deferred object can be converted to a jQuery promise, which is still not the same as ES6 promises. Instead, these objects are like a subset of a deferred object, having fewer functions.
+        - jQuery Deferreds
+            - Unfortunately, deferreds do NOT fully conform to the A+ spec. Where possible, we should be using ES6-style promises instead.
+            - Also unfortunately for us, jQuery is a core part of using Backbone, and deferred objects are returned from ajax calls, so for the time being they can be hard to avoid.
+            - Deferreds were made available first, and so have a different set of states and functions, which can make handling them confusing, especially when they end up being used in conjunction with other asynchronous code. Brief rundown of methods:
+                - then: takes callbacks for success, failure, or progress (runs based on progress notifications)
+                - done: takes callback for success
+                - fail: takes callback for failure
+                - always: takes callback for success or failure
+                - resolve, resolveWith: resolve the deferred
+                - reject, rejectWith: reject the deferred
+                - when: converts one or more objects to a promise, works similarly to Promise.all
+                - promise: retrieve the deferred’s promise object
+            - As well, deferreds are thenables, but the then handler does not return another deferred, so we cannot do the same chaining that is available with ES6-style promises.
 - Testing Asynchronous Code
 
     - Testing jquery-style promises.

@@ -102,16 +102,31 @@
     - Testing jquery-style promises.
     - Testing es6-style promises.
     - Brief mention of creating a fake server with Sinon.js. (Used in adminv2 express app)
-- Async/Await
-
-    - Coming in ES7 (ECMAScript2016)
-    - How does it work/What is the syntax?
-    - What’s the big deal?
-
-        - Allows code to look like synchronous code again, even if it’s being run asynchronously
 - Generators - Another way of doing asynchronous programming
-    - Brief discussion - could be another discussion entirely
-    - Provides a bit of a cleaner syntax
+    - A generator is a type of function whose execution can be paused and resumed later.
+    - This can happen several times in a generator - not limited to one pause.
+    - Why is this useful?
+
+    - To make a function a generator, declare/define the function with an asterisk (function*). Can also move the asterisk to just before the function name, as in function *fun.
+    - Use yield expressions to indicate where the function can be paused.
+    - When code calls this function the following happens:
+        - The function begins execution.
+        - If the yield keyword is reached, execution is paused and control is passed back to the caller. If the yield keyword is followed by a value, that value is sent to the caller. If this is left out, the value undefined is sent back to the caller.
+
     - Comes from Python
     - Allows for lazy sequences
     - Some examples.
+- Async/Await
+
+    - As we said earlier, coding style is always evolving. Promises are pretty awesome, but not without room for improvement.
+    - Coming in ES7, we can make our code even cleaner using two new keywords: async and await. This feature allows us to write asynchronous code that looks even more like simple synchronous code.
+    - Note: Async functions ==> used to be called defered functions.
+    - Involves two keywords: async and await
+    - The async keyword precedes the function definition/declaration. This wraps the function result in a promise, ensuring that the function returns a promise and can be used as such. If a value is returned the promise is resolved, if an error is thrown the promise is rejected. We no longer need to use calls to resolve and reject.
+    - Once a function is marked as async, you can precede any asynchronous calls inside that function with await. This will force the function to wait until the asynchronous operation has completed. The resolved value or rejected error will be returned.
+    - Note: Nested functions will also need the async keyword if they are going to be calling asynchronous operations.
+    - Note: Using the await keyword before a call to synchronous code simply runs that code as it always would.
+    - Maybe have an example with an inner function getting called multiple times to show things still happening in parallel?
+    - await* or await Promise.all(…)?
+    - You can use this feature if you are using the Traceur transpiler which converts ES6 to ES5 but with the option to add async/await. Maintained by Google. Does babel have this?
+- Slide for good links!

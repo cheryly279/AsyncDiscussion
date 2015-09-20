@@ -46,6 +46,7 @@
     - What are promises?
         - While they can seem confusing at first, they are basically a cleaner way of writing the same single-threaded asynchronous code we have been discussing. There’s no new “magic” on how Javascript asynchronous code works. It’s more like syntactic sugar. But it’s really good syntactic sugar, more like syntactic HFCS.
         - Promises allow us to treat the result of asynchronous code as a first-class citizen, similar to how Javascript allows us to pass functions around as arguments. We can now code in a way that is closer to how we would if we had the result synchronously - we can treat the promise itself as the result, even if the result is not complete yet.
+        - Promises follow a standard, allowing us to be assured of what the callbacks are, and that only one will be called.
         - All of the above makes more sense once you start using the syntax (use funny gif here?).
     - Syntax for using promises (we will define our own shortly)
         - Where before we would pass the callback(s) as an argument (usually the final argument) to a function call, we now pass that code to handlers that are already attached to the promise - using the then function. TBD: Write example using then, where catch code is the second argument.
@@ -79,7 +80,6 @@
     - Different types of promises/terminology
         - The concept of promises isn’t new, and has been handled in different ways by different libraries. This has resulted, unfortunately, in confusing terminology and different types of promises.
         - What we have been discussing so far are promises defined for Javascript, fulfilling a specification known as the Promises/A+ specification: https://promisesaplus.com/.
-
         - Some terminology clarifiers:
             - Thenable - an object (usually a promise) that has a then function, allowing us to chain our handlers.
             - Future - simply an older term for promises.
@@ -102,20 +102,6 @@
     - Testing jquery-style promises.
     - Testing es6-style promises.
     - Brief mention of creating a fake server with Sinon.js. (Used in adminv2 express app)
-- Generators - Another way of doing asynchronous programming
-    - A generator is a type of function whose execution can be paused and resumed later.
-    - This can happen several times in a generator - not limited to one pause.
-    - Why is this useful?
-
-    - To make a function a generator, declare/define the function with an asterisk (function*). Can also move the asterisk to just before the function name, as in function *fun.
-    - Use yield expressions to indicate where the function can be paused.
-    - When code calls this function the following happens:
-        - The function begins execution.
-        - If the yield keyword is reached, execution is paused and control is passed back to the caller. If the yield keyword is followed by a value, that value is sent to the caller. If this is left out, the value undefined is sent back to the caller.
-
-    - Comes from Python
-    - Allows for lazy sequences
-    - Some examples.
 - Async/Await
 
     - As we said earlier, coding style is always evolving. Promises are pretty awesome, but not without room for improvement.
@@ -129,4 +115,24 @@
     - Maybe have an example with an inner function getting called multiple times to show things still happening in parallel?
     - await* or await Promise.all(…)?
     - You can use this feature if you are using the Traceur transpiler which converts ES6 to ES5 but with the option to add async/await. Maintained by Google. Does babel have this?
+- Generators - Another way of doing asynchronous programming in ES6
+    - A generator is a type of function whose execution can be paused and resumed later.
+    - This can happen several times in a generator - not limited to one pause.
+    - Why is this useful?
+        - Can be used for iterating over a custom sequence. (example???)
+        - Can be used to write asynchronous code in a more synchronous way. A generator can be used to hide away the asynchronous details, allowing the calling code to appear like synchronous code.
+    - To make a function a generator, declare/define the function with an asterisk (function*). Can also move the asterisk to just before the function name, as in function *fun.
+    - Use yield expressions to indicate where the function can be paused.
+    - Generators execute as follows:
+        - Call the function and assign the result to a variable (var x = fun()). This doesn’t start the execution of the generator, but instead creates something calling a generator iterator. We will use this object to run, or iterate, through the generator.
+        - You call next() on the generator iterator to begin execution. The function will run until it encounters a yield expression. At this point, execution of the function is paused and control is passed back to the controller. If the yield keyword is followed by a value, that value is sent to the generator iterator. If this is left out, the value undefined is sent back.
+        - The value that is sent back is wrapped in an object literal with two properties: value (the value returned), and done, a boolean indicating if the function has returned because it completed.
+        - Something that is special about generators is that the communication goes both ways - a value is passed to the caller, AND the value sent to the next next call is passed BACK to the generator. This becomes the value that the yield expression evaluates to.
+        - Note: Need to have final next() call after last yield to finish method. You can think of this in terms of the last yield expression not being complete yet - it has sent a value to a caller, but not received the value it’s going to evaluate to.
+        - Note: You can pass a value into the first next call, but it is thrown away - since a yield expression has not yet been reached that will receive the value.
+    - Besides the manual way of iterating through a generator, you can use the for/of structure. This structure allows you to loop through a generator very easily - the details of creating the generator iterator, and extracting the value returned from it’s wrapped object are abstracted away for you. The loop completes when done is true.
+        - Note: When using generators this way, any value returned from a return statement at the end of the generator is lost. Instead, the final value you receive is the return value from the final yield. Also, no values can be passed back - there is only one-way communication when using for/of.
+    - Catching errors from generators or inside generators is done with a simple try/catch block. Errors can be sent to generators by using the throw method in place of the next method.
+    - Generators can “delegate” control to another iterator, where the generator iterator continues to iterate, but control passes to the other generator (and eventually back to the original generator when complete).
+    - Using delegation, combined with promises, allows us to define async/await. - Show complex code, talk about libraries?
 - Slide for good links!

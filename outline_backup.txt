@@ -1,6 +1,3 @@
-- LOOK INTO FETCH IN ES6 - talk to Rob, native to replace XmlHttpRequest, returns Promises
-- HTML5 Web Workers - new multithreading in javascript?
-
 - Asynchronous Primer
 
     - In the beginning...
@@ -53,7 +50,8 @@
         - What about when the asynchronous operation causes an error? The then handler covers this as well - the callback function to handle failures is passed to then as the second argument. TBD: Write example with success and failure callbacks.
         - For convenience, Promises also have a catch handler. This is simply a shorthand for then(null, function()..). TBD: Write example using catch.
         - The asynchronous code runs whether the then/catch handlers are used or not.
-        - Only one of the handlers will be called (success or failure), and the handler will only be called once. At any given time, a promise is in one of three states:
+        - Only one of the handlers will be called (success or failure), and the handler will only be called once.
+        - At any given time, a promise is in one of three states:
             - Pending - the asynchronous code has not completed yet.
             - Fulfilled - the asynchronous code has completed successfully.
             - Rejected - the asynchronous code has failed.
@@ -97,6 +95,21 @@
                 - when: converts one or more objects to a promise, works similarly to Promise.all
                 - promise: retrieve the deferred’s promise object
             - As well, deferreds are thenables, but the then handler does not return another deferred, so we cannot do the same chaining that is available with ES6-style promises.
+- Fetch API
+    - In addition to promises, ES6 also has a new API for performing AJAX requests, replacing XMLHttpRequest. ($.ajax is just a wrapper around this, right?)
+    - While a lot of our front-end code uses $.ajax (or calls Backbone methods that use $.ajax), this won’t always be the case. It’s important to know about the new, cleaner API coming our way.
+    - How does it work?
+        - This API revolves largely around the fetch method on the window object. A simple way to use this method is to pass it a URL, which will execute a GET request.
+        - Another way of using fetch is to pass a Request object, where you can specify the URL as well as configuration data, such as the request headers or the method of the request (GET, POST, etc.).
+        - You can define and configure your own response with the Response object.
+
+    - What are the benefits?
+        - Returns promises - rather than having to remember to use the onload and onerror callbacks, we just use then/catch as we would with other promises.
+        - The Request object makes it easier to configure the request, and copy the request to create other requests (cloning).
+        - The response body can be streamed, rather than having the entire response in memory.
+    - Downsides
+        - You cannot (yet) abort a promise, so you cannot abort a request. You can, however, cancel a stream.
+        - You cannot get progress events, to see how the request is going.
 - Testing Asynchronous Code
 
     - Testing jquery-style promises.
@@ -136,3 +149,11 @@
     - Generators can “delegate” control to another iterator, where the generator iterator continues to iterate, but control passes to the other generator (and eventually back to the original generator when complete).
     - Using delegation, combined with promises, allows us to define async/await. - Show complex code, talk about libraries?
 - Slide for good links!
+
+    - Asynchronous Coding
+    - Event loop
+        - https://www.youtube.com/watch?v=8aGhZQkoFbQ
+    - Promises
+    - Async/Await
+    - Generators
+    - Other

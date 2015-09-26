@@ -1,0 +1,22 @@
+{
+  "name": "AsyncDiscussion",
+  "version": "1.0.0",
+  "description": "Async Examples for Presentation",
+  "main": "index.js",
+  "scripts": {
+    "test": "not_applicable"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cheryly279/AsyncDiscussion.git"
+  },
+  "author": "Cheryl Yaeger",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cheryly279/AsyncDiscussion/issues"
+  },
+  "homepage": "https://github.com/cheryly279/AsyncDiscussion",
+  "dependencies": {
+    "traceur": "0.0.91"
+  }
+}

@@ -3,7 +3,7 @@ var fs_converted = require('./fs_converted');
 
 fs_converted.readdir('sample_files').then(function (files) {
     return Promise.all(files.map(function (file) {
-        return fs_converted.readFile(path.join(__dirname, 'sample_files', file));
+        return fs_converted.readFile(path.join('sample_files', file));
     }));
 }).then(function (dataArr) {
     return Promise.all(dataArr.map(function (data) {

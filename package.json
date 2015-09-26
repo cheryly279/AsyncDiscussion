@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/cheryly279/AsyncDiscussion",
   "dependencies": {
+    "node-fetch": "^1.3.2",
     "traceur": "0.0.91"
   }
 }

@@ -1,5 +1,5 @@
 var path = require('path');
-var fs_converted = require('./fs_converted');
+var fs_converted = require('../helpers/fs_converted');
 
 function getFileText(file) {
     fs_converted.readFile(file, 'utf8').then(function (data) {
